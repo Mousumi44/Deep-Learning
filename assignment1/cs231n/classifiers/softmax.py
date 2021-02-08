@@ -33,9 +33,31 @@ def softmax_loss_naive(W, X, y, reg):
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    #pass
+    N, D = X.shape
+    C = W.shape[1]
+    
+    #loss
+    for i in range(N):
+        logits = X[i] @ W
+        prob = np.exp(logits)/np.sum(np.exp(logits))
+        loss += -np.log(prob[y[i]])
+        
+        #gradient
+        for c in range(C):
+            if c==y[i]:
+                dW[:,c] += X[i] * (prob[c] - 1)
+            else:
+                dW[:,c] += X[i] * (prob[c])
+        
+    loss /= N
+    dW /= N
+    
+    loss += reg*np.sum(W*W)
+    dW += 2*reg*W
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+    
 
     return loss, dW
 
@@ -58,7 +80,20 @@ def softmax_loss_vectorized(W, X, y, reg):
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    #pass
+    
+    N, D = X.shape
+    C = W.shape[1]
+    
+    logits = X @ W
+    prob = np.exp(logits)/np.sum(np.exp(logits), axis=1).reshape(-1,1)
+    loss = -np.sum(np.log(prob[range(N),y]))/N
+    loss += reg*np.sum(W*W)
+    
+    mask = np.eye(C)[y]
+    dW= X.T@(prob-mask)/N
+    dW += 2*reg*W
+    
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
