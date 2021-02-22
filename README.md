@@ -21,15 +21,15 @@ This repository is my implementation of assignments and projects of COMP 6650: D
 
 ## [Assignment 2](https://cs231n.github.io/assignments2019/assignment2/)
 
-✅ [Q1: Fully-connected Neural Network](https://github.com/chriskhanhtran/CS231n-CV/blob/master/assignment2/FullyConnectedNets.ipynb)
+✅ Q1: Fully-connected Neural Network
 
-✅ [Q2: Batch Normalization](https://github.com/chriskhanhtran/CS231n-CV/blob/master/assignment2/BatchNormalization.ipynb)
+✅ Q2: Batch Normalization
 
-✅ [Q3: Dropout](https://github.com/chriskhanhtran/CS231n-CV/blob/master/assignment2/Dropout.ipynb)
+✅ Q3: Dropout
 
-✅ [Q4: Convolutional Networks](https://github.com/chriskhanhtran/CS231n-CV/blob/master/assignment2/ConvolutionalNetworks.ipynb)
+✅ Q4: Convolutional Networks
 
-✅ [Q5: PyTorch on CIFAR-10](https://github.com/chriskhanhtran/CS231n-CV/blob/master/assignment2/PyTorch.ipynb)
+✅ Q5: PyTorch on CIFAR-10
 
 Version: PyTorch 1.4.0
 
