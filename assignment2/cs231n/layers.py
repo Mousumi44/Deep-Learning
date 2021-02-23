@@ -203,7 +203,20 @@ def batchnorm_forward(x, gamma, beta, bn_param):
         #######################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        #pass
+        #shift and scale
+        mean = x.mean(axis=0)
+        var = x.var(axis=0)
+        sigma = np.sqrt(var+eps)
+        x_norm = (x-mean)/sigma
+        out = gamma*x_norm + beta
+        
+        #update running variables
+        running_mean = momentum*running_mean + (1-momentum)*mean
+        running_var = momentum*running_var + (1-momentum)*var
+        
+        #Cache
+        cache = (x, mean, sigma, x_norm, gamma)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         #######################################################################
@@ -218,7 +231,9 @@ def batchnorm_forward(x, gamma, beta, bn_param):
         #######################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        #pass
+        x_norm = (x-running_mean)/np.sqrt(running_var+eps)
+        out = gamma*x_norm + beta
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         #######################################################################
@@ -260,7 +275,18 @@ def batchnorm_backward(dout, cache):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    #pass
+    x, mean, sigma, x_norm, gamma = cache
+    N = dout.shape[0]
+    
+    dbeta = np.sum(dout, axis=0)
+    dgamma = np.sum(dout*x_norm, axis=0)
+    
+    dx_norm = dout*gamma
+    dvar = -0.5*np.sum(dx_norm*(x-mean)*sigma**(-3),axis=0)
+    dmean = -np.sum(dx_norm/sigma, axis=0)
+    
+    dx = dx_norm/sigma + dvar*2*(x-mean)/N + dmean/N
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -295,7 +321,16 @@ def batchnorm_backward_alt(dout, cache):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    #pass
+    x, mean, sigma, x_norm, gamma = cache
+    N = dout.shape[0]
+    
+    dbeta = np.sum(dout, axis=0)
+    dgamma = np.sum(dout*x_norm, axis=0)
+    
+    dx_norm = dout*gamma
+    dx =  (N * dx_norm - np.sum(dx_norm, axis=0) - x_norm * np.sum(dx_norm * x_norm, axis=0)) / (sigma * N)
+    
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -341,7 +376,15 @@ def layernorm_forward(x, gamma, beta, ln_param):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    #pass
+    mean = x.mean(axis=1, keepdims=True)
+    var = x.var(axis=1, keepdims=True)
+    sigma = np.sqrt(var+eps)
+    x_norm = (x-mean)/sigma
+    out = gamma*x_norm + beta
+    
+    #Cache
+    cache = (sigma, x_norm, gamma)
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -376,7 +419,17 @@ def layernorm_backward(dout, cache):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    #pass
+    sigma, x_norm, gamma = cache
+    D = dout.shape[1]
+
+    # Compute gradients
+    dbeta = np.sum(dout, axis=0)
+    dgamma = np.sum(dout * x_norm, axis=0)
+    dx_norm = dout * gamma
+    dx = (
+        D * dx_norm - np.sum(dx_norm, axis=1, keepdims=True) - x_norm * np.sum(dx_norm * x_norm, axis=1, keepdims=True)
+    ) / (sigma * D)
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
