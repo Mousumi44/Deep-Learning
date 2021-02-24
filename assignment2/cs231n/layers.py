@@ -701,7 +701,25 @@ def max_pool_forward_naive(x, pool_param):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    #pass
+    pool_height = pool_param["pool_height"]
+    pool_width = pool_param["pool_width"]
+    stride = pool_param["stride"]
+    N,C,H,W = x.shape
+    
+    #Dimension
+    Hout = 1 + (H-pool_height)//stride
+    Wout = 1 + (W-pool_width)//stride
+    x_argmax = np.zeros_like(x)
+    out = np.zeros((N,C,Hout,Wout))
+    
+    for row in range(Hout):
+        for col in range(Wout):
+            row_start = row*stride
+            row_end = row_start+pool_height
+            col_start = col*stride
+            col_end = col_start+pool_width
+            out[:,:,row,col] = x[:, :, row_start:row_end, col_start:col_end].max(axis=(2, 3))
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -728,7 +746,35 @@ def max_pool_backward_naive(dout, cache):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    #pass
+    x, pool_param = cache
+    pool_height = pool_param["pool_height"]
+    pool_width = pool_param["pool_width"]
+    stride = pool_param["stride"]
+    N,C,H,W = x.shape
+    
+    #Dimension
+    Hout = 1 + (H-pool_height)//stride
+    Wout = 1 + (W-pool_width)//stride
+    dx = np.zeros_like(x)
+    
+    
+    for row in range(Hout):
+        for col in range(Wout):
+            row_start = row*stride
+            row_end = row_start+pool_height
+            col_start = col*stride
+            col_end = col_start+pool_width
+            
+            # Find position of the max neuron for each window
+            x_temp = x[:, :, row_start:row_end, col_start:col_end]
+            x_temp_max = x_temp.max(axis=(2, 3)).reshape(N, C, 1, 1)
+            x_temp_argmax = x_temp == x_temp_max
+
+            # Backward pass for max neurons only
+            dx[:, :, row_start:row_end, col_start:col_end][x_temp_argmax] += dout[:, :, row, col].reshape(-1)
+
+            
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -770,7 +816,12 @@ def spatial_batchnorm_forward(x, gamma, beta, bn_param):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    #pass
+    N, C, H, W = x.shape
+    x_reshape = x.transpose(0, 2, 3, 1).reshape(-1, C)
+    out, cache = batchnorm_forward(x_reshape, gamma, beta, bn_param)
+    out = out.reshape(N, H, W, C).transpose(0, 3, 1, 2)
+    
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -804,7 +855,11 @@ def spatial_batchnorm_backward(dout, cache):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    #pass
+    N, C, H, W = dout.shape
+    dout_reshape = dout.transpose(0, 2, 3, 1).reshape(-1, C)
+    dx, dgamma, dbeta = batchnorm_backward_alt(dout_reshape, cache)
+    dx = dx.reshape(N, H, W, C).transpose(0, 3, 1, 2)
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -844,7 +899,13 @@ def spatial_groupnorm_forward(x, gamma, beta, G, gn_param):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    #pass
+    N, C, H, W = x.shape
+    x = x.reshape(N * G, -1)
+    out_ln, cache_ln = layernorm_forward(x, 1, 0, gn_param)
+    out_ln = out_ln.reshape(N, C, H, W)
+    out = gamma * out_ln + beta
+    cache = (out_ln, cache_ln, G, gamma)
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -874,7 +935,14 @@ def spatial_groupnorm_backward(dout, cache):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    #pass
+    N, C, H, W = dout.shape
+    out_ln, cache_ln, G, gamma = cache
+    dbeta = np.sum(dout, axis=(0, 2, 3), keepdims=True)
+    dgamma = np.sum(dout * out_ln, axis=(0, 2, 3), keepdims=True)
+    dout_ln = (dout * gamma).reshape(N * G, -1)
+    dx, _, _ = layernorm_backward(dout_ln, cache_ln)
+    dx = dx.reshape(N, C, H, W)
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
