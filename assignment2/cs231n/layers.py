@@ -571,7 +571,34 @@ def conv_forward_naive(x, w, b, conv_param):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    #pass
+    pad = conv_param["pad"]
+    stride = conv_param["stride"]
+    
+    #Dimension
+    N, C, H, W = x.shape
+    F, _, HH, WW = w.shape
+    Hout = 1 + (H + 2 * pad - HH) // stride
+    Wout = 1 + (W + 2 * pad - WW) // stride
+    
+    out = np.zeros((N, F, Hout, Wout))
+    
+    #Pad input
+    npad = ((0,0),(0,0),(pad,pad),(pad,pad))
+    x_pad = np.pad(x, pad_width=npad,mode='constant')
+    
+    #CNN Forward Pass
+    w_reshaped = w.reshape(F, -1) # Reshape (F, C, HH, WW) to (F, C * HH * WW)
+    
+    for row in range(Hout):
+        for col in range(Wout):
+            row_start = row*stride
+            row_end = row_start + HH
+            col_start = col*stride
+            col_end = col_start + WW
+            x_temp = x_pad[:, :, row_start:row_end, col_start:col_end].reshape(N, -1)  # (N, C * HH * WW)
+            out[:, :, row, col] = x_temp @ w_reshaped.T + b  # (N, F)
+            
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
