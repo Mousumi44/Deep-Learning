@@ -627,8 +627,48 @@ def conv_backward_naive(dout, cache):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    #pass
+    x, w, b, conv_param = cache
+    pad = conv_param["pad"]
+    stride = conv_param["stride"]
+    
+    #Dimension
+    N, C, H, W = x.shape
+    F, _, HH, WW = w.shape
+    Hout = 1 + (H + 2 * pad - HH) // stride
+    Wout = 1 + (W + 2 * pad - WW) // stride
+    
+    out = np.zeros((N, F, Hout, Wout))
+    
+    #Pad input
+    npad = ((0,0),(0,0),(pad,pad),(pad,pad))
+    x_pad = np.pad(x, pad_width=npad,mode='constant')
+    
+    #CNN Backward Pass
+    w_reshaped = w.reshape(F, -1) # Reshape (F, C, HH, WW) to (F, C * HH * WW)
+    dx_pad = np.zeros_like(x_pad)
+    db = np.zeros_like(b)
+    dw = np.zeros_like(w)
+    
+    for row in range(Hout):
+        for col in range(Wout):
+            row_start = row*stride
+            row_end = row_start + HH
+            col_start = col*stride
+            col_end = col_start + WW
+            x_temp = x_pad[:, :, row_start:row_end, col_start:col_end].reshape(N, -1)  # (N, C * HH * WW)
+           
+            dout_temp = dout[:, :, row, col]
 
+            # Calculate gradients
+            dx_temp = (dout_temp @ w_reshaped).reshape(N, C, HH, WW)
+            dx_pad[:, :, row_start:row_end, col_start:col_end] += dx_temp
+            db += np.sum(dout_temp, axis=0)
+            dw += (dout_temp.T @ x_temp).reshape(F, C, HH, WW)
+            
+    # Unpad dx
+    dx = dx_pad[:, :, pad:-pad, pad:-pad]
+            
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
     #                             END OF YOUR CODE                            #
