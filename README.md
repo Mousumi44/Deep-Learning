@@ -33,3 +33,8 @@ This repository is my implementation of assignments and projects of COMP 6650: D
 
 Version: PyTorch 1.4.0
 
+## Projects
+### [Image Classification](https://github.com/Mousumi44/Deep-Learning/tree/main/Projects/Image%20Classification)
+
+In this project, I've implemented several DNN models ([Feedforward Neural Network](https://github.com/Mousumi44/Deep-Learning/blob/main/Projects/Image%20Classification/NN%20Models/feedforward_classify.py), [Convolutional Neural Network (CNN)](https://github.com/Mousumi44/Deep-Learning/blob/main/Projects/Image%20Classification/NN%20Models/cnn_classify.py), [Recurrent Neural Network (RNN)](https://github.com/Mousumi44/Deep-Learning/blob/main/Projects/Image%20Classification/NN%20Models/rnn_classify.py), [Gated Recurrent Unit (GRU)] (https://github.com/Mousumi44/Deep-Learning/blob/main/Projects/Image%20Classification/NN%20Models/gru_classify.py), [Long Short Term Memory (LSTM)](https://github.com/Mousumi44/Deep-Learning/blob/main/Projects/Image%20Classification/NN%20Models/lstm_classify.py) and [BIdirectional Long Short Term Memory (BiLSTM)] (https://github.com/Mousumi44/Deep-Learning/blob/main/Projects/Image%20Classification/NN%20Models/bidirectional_lstm_classify.py)) using **PyTorch** on [Fashion MNIST Dataset](https://pytorch.org/vision/stable/datasets.html) and compared their performance. The checkpoints can be found [here](https://github.com/Mousumi44/Deep-Learning/tree/main/Projects/Image%20Classification/Checkpoints).
+
