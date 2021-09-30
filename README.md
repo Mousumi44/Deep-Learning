@@ -48,7 +48,7 @@ In this project, I've implemented several DNN models ([Feedforward NN](https://g
 |    BiLSTM   |      2     |     256     |     10     |     0.001     |     64     |      84.47 %     |     83.47 %     |
 
 
-##[Image Classification on CIFAR10](https://github.com/Mousumi44/Deep-Learning/tree/main/Finetune_VGG16)
+## [Image Classification on CIFAR10](https://github.com/Mousumi44/Deep-Learning/tree/main/Finetune_VGG16)
 
 In this project, I've finetuned VGG16 for image classification on [CIFAR10 dataset](https://pytorch.org/vision/stable/datasets.html). Originally, VGG16 was trained on Imagenet (1000 classes), that's why I have to modify the last layer (to 10 classes) . I also added one additional fully connected layer on top of the original VGG16 model. As I've finetuned the model, only the last 2 layers have been trained keping other layers frozen. The checkpoints can be found [here](https://tigermailauburn-my.sharepoint.com/:u:/g/personal/mza0170_auburn_edu/Ea-bUPg42I9AtJVq4JtiRhoBtHzU6tVeRhbvKkt57UBQiA?e=KKDXjz). Hyperparameters are shown below:
 
